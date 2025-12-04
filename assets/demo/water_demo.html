@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Water Monitoring Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* General Styles */
+        body {
+            background-color: #282c34; /* Dark background from screenshot */
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #20232a; /* Slightly darker header */
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        .header-icons span {
+            margin-left: 15px;
+            font-size: 24px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        /* Gauge Styles */
+        .gauge-container {
+            text-align: center;
+            background-color: #282c34;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .gauge-label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #e0e0e0;
+        }
+
+        .gauge {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .gauge-svg {
+            transform: rotate(135deg); /* Rotate to start at 225 deg (135 + 90) and cover 270 deg */
+            width: 100%;
+        }
+
+        .gauge-track {
+            stroke: #444;
+            stroke-width: 15;
+            fill: none;
+        }
+
+        .gauge-arc {
+            stroke: #00ff00; /* Bright green color */
+            stroke-width: 15;
+            fill: none;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease-in-out;
+        }
+
+        .gauge-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: bold;
+            color: #00ff00; /* Bright green for the value */
+        }
+
+        .gauge-unit {
+            font-size: 14px;
+            font-weight: normal;
+            color: #00ff00;
+        }
+
+        .gauge-min-max {
+            display: flex;
+            justify-content: space-between;
+            margin-top: -20px;
+            padding: 0 5px;
+            font-size: 12px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Water Monitoring<span style="color: #00ff00;"> •</span></h1>
+    <div class="header-icons">
+        <span style="color: #00ff00;">🛠️</span>
+        <span style="color: #e0e0e0;">🔔</span>
+        <span style="color: #e0e0e0;">ⓘ</span>
+    </div>
+</div>
+
+<div class="container">
+    <div class="gauge-container" id="temp-gauge">
+        <div class="gauge-label">Temperature</div>
+        <div class="gauge">
+            <svg viewBox="0 0 100 100" class="gauge-svg">
+                <circle cx="50" cy="50" r="40" class="gauge-track" stroke-dasharray="188.5" stroke-dashoffset="47.125"></circle>
+                <circle cx="50" cy="50" r="40" class="gauge-arc" id="temp-arc" stroke-dasharray="188.5" stroke-dashoffset="188.5"></circle>
+            </svg>
+            <div class="gauge-value" id="temp-value">--<span class="gauge-unit">°C</span></div>
+        </div>
+        <div class="gauge-min-max"><span>0</span><span>60</span></div>
+    </div>
+
+    <div class="gauge-container" id="tds-gauge">
+        <div class="gauge-label">TDS</div>
+        <div class="gauge">
+            <svg viewBox="0 0 100 100" class="gauge-svg">
+                <circle cx="50" cy="50" r="40" class="gauge-track" stroke-dasharray="188.5" stroke-dashoffset="47.125"></circle>
+                <circle cx="50" cy="50" r="40" class="gauge-arc" id="tds-arc" stroke-dasharray="188.5" stroke-dashoffset="188.5"></circle>
+            </svg>
+            <div class="gauge-value" id="tds-value">--<span class="gauge-unit">ppm</span></div>
+        </div>
+        <div class="gauge-min-max"><span>0</span><span>2000</span></div>
+    </div>
+
+    <div class="gauge-container" id="turbidity-gauge">
+        <div class="gauge-label">Turbidity NTU</div>
+        <div class="gauge">
+            <svg viewBox="0 0 100 100" class="gauge-svg">
+                <circle cx="50" cy="50" r="40" class="gauge-track" stroke-dasharray="188.5" stroke-dashoffset="47.125"></circle>
+                <circle cx="50" cy="50" r="40" class="gauge-arc" id="turbidity-arc" stroke-dasharray="188.5" stroke-dashoffset="188.5"></circle>
+            </svg>
+            <div class="gauge-value" id="turbidity-value">--</div>
+        </div>
+        <div class="gauge-min-max"><span>0</span><span>10</span></div>
+    </div>
+
+    <div class="gauge-container" id="ph-gauge">
+        <div class="gauge-label">pH Value</div>
+        <div class="gauge">
+            <svg viewBox="0 0 100 100" class="gauge-svg">
+                <circle cx="50" cy="50" r="40" class="gauge-track" stroke-dasharray="188.5" stroke-dashoffset="47.125"></circle>
+                <circle cx="50" cy="50" r="40" class="gauge-arc" id="ph-arc" stroke-dasharray="188.5" stroke-dashoffset="188.5"></circle>
+            </svg>
+            <div class="gauge-value" id="ph-value">--</div>
+        </div>
+        <div class="gauge-min-max"><span>0</span><span>15</span></div>
+    </div>
+
+    <div class="gauge-container" id="orp-gauge" style="grid-column: 1 / span 2;">
+        <div class="gauge-label">ORP mV</div>
+        <div class="gauge" style="max-width: 50%; margin: auto;">
+            <svg viewBox="0 0 100 100" class="gauge-svg">
+                <circle cx="50" cy="50" r="40" class="gauge-track" stroke-dasharray="188.5" stroke-dashoffset="47.125"></circle>
+                <circle cx="50" cy="50" r="40" class="gauge-arc" id="orp-arc" stroke-dasharray="188.5" stroke-dashoffset="188.5"></circle>
+            </svg>
+            <div class="gauge-value" id="orp-value">--</div>
+        </div>
+        <div class="gauge-min-max" style="max-width: 50%; margin: auto;"><span>0</span><span>1000</span></div>
+    </div>
+</div>
+
+<script>
+    // Constants for the gauges (based on your screenshot)
+    const gauges = {
+        temp: { min: 0, max: 60, arcId: 'temp-arc', valueId: 'temp-value', unit: '°C' },
+        tds: { min: 0, max: 2000, arcId: 'tds-arc', valueId: 'tds-value', unit: 'ppm' },
+        turbidity: { min: 0, max: 10, arcId: 'turbidity-arc', valueId: 'turbidity-value', unit: '' },
+        ph: { min: 0, max: 15, arcId: 'ph-arc', valueId: 'ph-value', unit: '' },
+        orp: { min: 0, max: 1000, arcId: 'orp-arc', valueId: 'orp-value', unit: '' } // Added ORP from screenshot
+    };
+
+    // The length of the circular path for a 270-degree arc (3/4 circle).
+    // Circumference (2*pi*r) for r=40 is approx 251.3.
+    // 270 degrees is 3/4 of a circle, so 251.3 * 0.75 = 188.5
+    const CIRCUMFERENCE = 2 * Math.PI * 40;
+    const ARC_LENGTH = CIRCUMFERENCE * (270 / 360); // 188.5
+
+    /**
+     * Updates a single gauge based on the current value.
+     * @param {string} key - The key for the gauge (e.g., 'temp').
+     * @param {number} currentValue - The new sensor value.
+     */
+    function updateGauge(key, currentValue) {
+        const gauge = gauges[key];
+        const arc = document.getElementById(gauge.arcId);
+        const valueElement = document.getElementById(gauge.valueId);
+
+        // Calculate percentage of the range
+        const range = gauge.max - gauge.min;
+        const normalizedValue = Math.min(Math.max(currentValue, gauge.min), gauge.max);
+        const percent = (normalizedValue - gauge.min) / range;
+
+        // Calculate the stroke-dashoffset: 
+        // 0% fills the arc (offset = ARC_LENGTH)
+        // 100% leaves the arc empty (offset = 0)
+        const offset = ARC_LENGTH - (percent * ARC_LENGTH);
+
+        // Update the visual arc
+        arc.style.strokeDashoffset = offset;
+
+        // Update the display value
+        const formattedValue = parseFloat(normalizedValue.toFixed(1));
+        valueElement.innerHTML = `${formattedValue}<span class="gauge-unit">${gauge.unit}</span>`;
+    }
+
+    /**
+     * Simulates the Arduino's reading loop by generating random, realistic values.
+     */
+    function simulateReadings() {
+        // Simulating values close to your screenshot's example data
+        const simulatedData = {
+            temp: 29.1 + (Math.random() - 0.5) * 1.5, // 29.1 +/- 0.75
+            tds: 48.6 + (Math.random() - 0.5) * 5,   // 48.6 +/- 2.5
+            turbidity: 2.9 + (Math.random() - 0.5) * 0.5, // 2.9 +/- 0.25
+            ph: 5.7 + (Math.random() - 0.5) * 0.3,   // 5.7 +/- 0.15
+            orp: 289 + (Math.random() - 0.5) * 20    // 289 +/- 10 (ORP not in code, but in UI)
+        };
+
+        // Update all gauges
+        for (const key in simulatedData) {
+            updateGauge(key, simulatedData[key]);
+        }
+    }
+
+    // Initialize the demo by running the simulation loop every second
+    simulateReadings(); // Run once immediately
+    setInterval(simulateReadings, 1000); // Run every 1000 milliseconds (1 second)
+</script>
+
+</body>
+</html>

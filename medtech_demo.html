@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaGuide Pro 💊 - Demo</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* CSS from header.php and style.css combined and refined */
+        :root {
+            /* UPDATED COLOR PALETTE (Dark Blue) */
+            --primary-color: #1f3d5a; /* Dark Navy Blue */
+            --primary-light: #2a6190; /* Corporate Blue */
+            --bg-color: #f0f3f7      /* Very light Blue/Gray bg */
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Style Adjustments */
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Card Styles */
+        .medicine-card {
+            background-color: var(--card-bg);
+            border: 1px solid #f0fdfa; /* subtle border */
+            border-radius: 15px;
+            overflow: hidden;
+            transition: box-shadow 0.3s, transform 0.3s;
+            height: 100%; /* Important for grid alignment */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .medicine-card:hover {
+            /* Shadow adjusted to use the new primary color */
+            box-shadow: 0 8px 20px rgba(31, 61, 90, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Image Styles */
+        .medicine-img {
+            height: 200px;
+            object-fit: contain;
+            width: 100%;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0fdfa;
+            padding: 15px;
+        }
+
+        /* Category Badge */
+        .badge-category {
+            /* Uses rgba of the new primary color */
+            background-color: rgba(31, 61, 90, 0.15); 
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 12px 15px;
+        }
+        
+        .form-control:focus {
+             /* Focus shadow adjusted to use the new primary light color */
+            box-shadow: 0 0 0 3px rgba(42, 97, 144, 0.2); 
+            border-color: var(--primary-light);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* Style for the header back button */
+        .btn-light.border {
+            border-color: #e2e8f0 !important;
+        }
+
+        .btn-action-icon {
+            width: 35px;
+            height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            padding: 0;
+            transition: background-color 0.2s;
+        }
+        .btn-action-icon:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .text-warning { color: #f9b115 !important; }
+        .text-danger { color: #e54d4d !important; }
+
+        /* Footer positioning */
+        .main-content {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="bg-white shadow-sm border-bottom sticky-top">
+        <div class="container py-3 header-content">
+            <h1 class="h3 fw-bold text-dark m-0">
+                <i class="bi bi-capsule-pill me-2 text-primary"></i>
+                PharmaGuide 💊
+            </h1>
+            
+          
+            
+        </div>
+    </header>
+
+    <div class="container pb-5 main-content pt-4">
+        
+        <div class="row align-items-center mb-4">
+            <div class="col-md-6">
+                <h2 class="fw-bold text-dark mb-1">Medicine Inventory</h2>
+                <p class="text-muted">Manage and track your pharmaceutical stock.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="btn btn-primary shadow-sm" onclick="simulateRedirect('add.php', 'Adding New Medicine (add.php)', 'This button simulates a click-through to the separate PHP page for adding medicine.')">
+                    <i class="bi bi-plus-lg me-2"></i>Add New Medicine
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 p-3 mb-5 rounded-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-8">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by medicine name...">
+                </div>
+                <div class="col-md-4">
+                    <select id="categoryFilter" class="form-select" onchange="filterCategory(this.value)">
+                        <option value="all">Filter by Category (All)</option>
+                        <option value="Pain Relievers">Pain Relievers</option>
+                        <option value="Antibiotics">Antibiotics</option>
+                        <option value="Vitamins">Vitamins</option>
+                        <option value="Allergy">Allergy</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4" id="medicineList">
+            <div class="col medicine-card-container">
+                <div class="medicine-card shadow-sm h-100 p-4" data-category="Pain Relievers">
+                    <div class="text-center mb-4">
+                        <img src="assets/img/paracetamol.avif" 
+                             class="medicine-img" 
+                             alt="Paracetamol">
+                    </div>
+                    
+                    <div class="card-body p-0 d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge-category">Pain Relievers</span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Paracetamol</h5>
+                        <p class="card-text small text-muted mb-3 text-truncate">Tablet</p>
+                        
+                        <div class="mt-auto d-flex align-items-center justify-content-between pt-3 border-top">
+                            <a href="#" class="btn btn-outline-primary btn-sm rounded-3 px-3" 
+                               onclick="simulateRedirect('medicine.php?id=1', 'View Details (medicine.php)', 'This simulates the details page for a medicine entry.')">
+                                View Details
+                            </a>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn btn-action-icon btn-light text-warning" title="Edit" 
+                                   onclick="simulateRedirect('edit.php?id=1', 'Edit Entry (edit.php)', 'This simulates the form used to update a medicine entry.')">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a href="#" onclick="simulateDelete(1)" class="btn btn-action-icon btn-light text-danger" title="Delete">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col medicine-card-container">
+                <div class="medicine-card shadow-sm h-100 p-4" data-category="Antibiotics">
+                    <div class="text-center mb-4">
+                        <img src="assets/img/amox.webp" 
+                             class="medicine-img" 
+                             alt="Amoxicillin">
+                    </div>
+                    
+                    <div class="card-body p-0 d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge-category">Antibiotics</span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Amoxicillin</h5>
+                        <p class="card-text small text-muted mb-3 text-truncate">Capsule</p>
+                        
+                        <div class="mt-auto d-flex align-items-center justify-content-between pt-3 border-top">
+                            <a href="#" class="btn btn-outline-primary btn-sm rounded-3 px-3" 
+                               onclick="simulateRedirect('medicine.php?id=2', 'View Details (medicine.php)', 'This simulates the details page for a medicine entry.')">
+                                View Details
+                            </a>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn btn-action-icon btn-light text-warning" title="Edit" 
+                                   onclick="simulateRedirect('edit.php?id=2', 'Edit Entry (edit.php)', 'This simulates the form used to update a medicine entry.')">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a href="#" onclick="simulateDelete(2)" class="btn btn-action-icon btn-light text-danger" title="Delete">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col medicine-card-container">
+                <div class="medicine-card shadow-sm h-100 p-4" data-category="Vitamins">
+                    <div class="text-center mb-4">
+                        <img src="assets/img/vitamin.webp" 
+                             class="medicine-img" 
+                             alt="Vitamin C">
+                    </div>
+                    
+                    <div class="card-body p-0 d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge-category">Vitamins</span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Vitamin C (Ascorbic Acid)</h5>
+                        <p class="card-text small text-muted mb-3 text-truncate">Chewable Tablet</p>
+                        
+                        <div class="mt-auto d-flex align-items-center justify-content-between pt-3 border-top">
+                            <a href="#" class="btn btn-outline-primary btn-sm rounded-3 px-3" 
+                               onclick="simulateRedirect('medicine.php?id=3', 'View Details (medicine.php)', 'This simulates the details page for a medicine entry.')">
+                                View Details
+                            </a>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn btn-action-icon btn-light text-warning" title="Edit" 
+                                   onclick="simulateRedirect('edit.php?id=3', 'Edit Entry (edit.php)', 'This simulates the form used to update a medicine entry.')">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a href="#" onclick="simulateDelete(3)" class="btn btn-action-icon btn-light text-danger" title="Delete">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        // JavaScript for simulating PHP interactions with SweetAlert2
+        function simulateRedirect(file, title, text) {
+            Swal.fire({
+                title: title,
+                text: text + ' (Links to: ' + file + ')',
+                icon: 'info',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                },
+                buttonsStyling: false
+            });
+            // In the actual PHP project, this would be: window.location = file;
+        }
+
+        function simulateDelete(id) {
+            Swal.fire({
+                title: 'Confirm Deletion (delete.php)',
+                text: "Are you sure you want to delete this medicine? This action links to 'delete.php?id=" + id + "' for server-side processing.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-2',
+                    cancelButton: 'btn btn-light'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Simulated Deletion!',
+                        text: 'Deletion logic would execute on delete.php and then redirect back to this page (index.php) with a success message.',
+                        icon: 'success',
+                        confirmButtonText: 'Close',
+                        customClass: {
+                            confirmButton: 'btn btn-primary',
+                        },
+                        buttonsStyling: false
+                    });
+                    // In the actual PHP project, this would be: window.location = 'delete.php?id=' + id;
+                }
+            });
+        }
+        
+        // JavaScript for Search and Filter (from script.js)
+
+        // Search function
+        document.getElementById("searchInput")?.addEventListener("keyup", function () {
+            let filter = this.value.toLowerCase();
+            let cards = document.querySelectorAll(".medicine-card-container");
+
+            cards.forEach(container => {
+                let card = container.querySelector(".medicine-card");
+                let titleElement = card.querySelector(".card-title");
+                
+                // Ensure element exists before accessing textContent
+                if (titleElement) {
+                    let text = titleElement.textContent.toLowerCase();
+                    if (text.includes(filter)) {
+                        container.style.display = "block";
+                    } else {
+                        container.style.display = "none";
+                    }
+                }
+            });
+            // Re-apply category filter after search
+            filterCategory(document.getElementById("categoryFilter").value);
+        });
+
+        // Category filter (simplified logic for client-side demo)
+        function filterCategory(category) {
+            let cards = document.querySelectorAll(".medicine-card-container");
+            const currentSearchFilter = document.getElementById("searchInput").value.toLowerCase();
+
+            cards.forEach(container => {
+                let card = container.querySelector(".medicine-card");
+                let cardCategory = card.getAttribute("data-category");
+                let cardTitle = card.querySelector(".card-title").textContent.toLowerCase();
+                
+                const matchesCategory = (category === "all" || cardCategory === category);
+                const matchesSearch = cardTitle.includes(currentSearchFilter);
+
+                if (matchesCategory && matchesSearch) {
+                    container.style.display = "block";
+                } else {
+                    container.style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

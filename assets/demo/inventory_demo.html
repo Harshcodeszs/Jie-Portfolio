@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventory Management System Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* CSS adapted from your Swing colors and modern web design principles */
+        :root {
+            --header-bg: #34495e; /* Blue-Gray from Java Header */
+            --sidebar-bg: #f8f9fa; /* Light Gray */
+            --primary-blue: #3498db; 
+            --primary-green: #2ecc71;
+            --primary-red: #e74c3c;
+            --low-stock-bg: #fff3cd; /* Yellow/Warning */
+            --low-stock-color: #856404;
+            --out-stock-bg: #f8d7da; /* Red/Danger */
+            --out-stock-color: #721c24;
+            --in-stock-bg: #d4edda; /* Green/Success */
+            --in-stock-color: #155724;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background-color: #ecf0f1; /* Light background */
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 0 15px;
+        }
+
+        .sidebar button {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 15px;
+            border-left: 5px solid transparent;
+            transition: background-color 0.2s, border-left 0.2s;
+        }
+
+        .sidebar button:hover {
+            background-color: #e9ecef;
+        }
+
+        .sidebar button.active {
+            background-color: #dde1e5;
+            border-left: 5px solid var(--primary-blue);
+            font-weight: bold;
+        }
+
+        /* Content Area */
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        /* Dashboard Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            color: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .card-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .card-blue { background-color: var(--primary-blue); }
+        .card-green { background-color: var(--primary-green); }
+        .card-red { background-color: var(--primary-red); }
+
+        /* Table Section */
+        .product-list h2 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #ecf0f1; /* Light gray table header */
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Status Styling (from Java getStatusColor logic) */
+        .status-cell {
+            font-weight: bold;
+            text-align: center;
+            border-radius: 4px;
+            padding: 5px 8px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .status-IN_STOCK {
+            background-color: var(--in-stock-bg);
+            color: var(--in-stock-color);
+        }
+        .status-LOW_STOCK {
+            background-color: var(--low-stock-bg);
+            color: var(--low-stock-color);
+        }
+        .status-OUT_OF_STOCK {
+            background-color: var(--out-stock-bg);
+            color: var(--out-stock-color);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: var(--sidebar-bg);
+            font-size: 11px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>INVENTORY MANAGEMENT SYSTEM</h1>
+        <p>By Group 4</p>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <button class="active">Dashboard</button>
+            <button onclick="simulateAction('Add Product')">Add Product</button>
+            <button onclick="simulateAction('Edit Product')">Edit Product</button>
+            <button onclick="simulateAction('Delete Product')">Delete Product</button>
+            <hr style="margin: 10px 15px; border-color: #dde1e5;">
+            <button onclick="showReport('Stock Level Tracking')">Stock Level Tracking</button>
+            <button onclick="showReport('Expiry Tracking')">Expiry Tracking</button>
+            <button onclick="showReport('Inventory Evaluation')">Inventory Evaluation</button>
+        </div>
+
+        <div class="content">
+            <div class="dashboard">
+                <div class="card card-blue">
+                    <div class="card-title">Total Products</div>
+                    <div class="card-value" id="total-products">4</div>
+                </div>
+                <div class="card card-green">
+                    <div class="card-title">Total Value</div>
+                    <div class="card-value" id="total-value">₱475.00</div>
+                </div>
+                <div class="card card-red">
+                    <div class="card-title">Low Stock Items</div>
+                    <div class="card-value" id="low-stock-count">3</div>
+                </div>
+            </div>
+
+            <div class="product-list">
+                <h2>Product List</h2>
+                <div style="overflow-x: auto;">
+                    <table id="product-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Stock Status</th>
+                                <th>Expiry Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © BSIT 1-A Group 4 | All rights reserved
+    </div>
+
+<script>
+    // --- JAVASCRIPT LOGIC (Translated from Java) ---
+
+    // Initial Data Set (Simulated data based on your screenshot)
+    let productData = [
+        { id: 1, name: "Jie", quantity: 12, price: 30.00, category: "Beverages", expiryDate: new Date('2025-05-31') },
+        { id: 2, name: "Ash", quantity: 3, price: 23.00, category: "Beverages", expiryDate: new Date('2025-06-29') },
+        { id: 3, name: "Beng", quantity: 0, price: 12.00, category: "Snacks", expiryDate: null },
+        { id: 4, name: "Tootpaste", quantity: 2, price: 23.00, category: "Groceries", expiryDate: null }
+    ];
+
+    /**
+     * Replicates the Product class methods for calculating status and formatting.
+     * @param {Object} product - A product object.
+     * @returns {string} The stock status string.
+     */
+    function getStockStatus(quantity) {
+        if (quantity === 0) return "OUT_OF_STOCK";
+        if (quantity <= 10) return "LOW_STOCK";
+        return "IN_STOCK";
+    }
+
+    function formatPrice(price) {
+        return `₱${price.toFixed(2)}`;
+    }
+
+    function formatExpiry(date) {
+        if (!date) return "Non-perishable";
+        // Simple date formatting: May 31, 2025
+        return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+    }
+
+    /**
+     * Renders the product data into the HTML table. (Equivalent to refreshTable())
+     */
+    function renderTable() {
+        const tableBody = document.querySelector('#product-table tbody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        // Sort data by category then by ID (Mimicking Java's Comparator)
+        const sortedData = [...productData].sort((a, b) => {
+            if (a.category < b.category) return -1;
+            if (a.category > b.category) return 1;
+            return a.id - b.id;
+        });
+
+        sortedData.forEach(product => {
+            const row = tableBody.insertRow();
+            const status = getStockStatus(product.quantity);
+
+            row.innerHTML = `
+                <td>${product.id}</td>
+                <td>${product.name.charAt(0).toUpperCase() + product.name.slice(1)}</td>
+                <td>${product.category}</td>
+                <td>${product.quantity}</td>
+                <td>${formatPrice(product.price)}</td>
+                <td>
+                    <span class="status-cell status-${status}">
+                        ${status.replace('_', ' ')}
+                    </span>
+                </td>
+                <td>${formatExpiry(product.expiryDate)}</td>
+            `;
+        });
+    }
+
+    /**
+     * Updates the dashboard cards. (Equivalent to updateDashboard())
+     */
+    function updateDashboard() {
+        // Total products
+        document.getElementById('total-products').textContent = productData.length;
+
+        // Total value
+        const totalValue = productData.reduce((sum, p) => sum + (p.quantity * p.price), 0);
+        document.getElementById('total-value').textContent = formatPrice(totalValue);
+
+        // Low stock count (Quantity <= 10)
+        const lowStockCount = productData.filter(p => p.quantity > 0 && p.quantity <= 10).length + productData.filter(p => p.quantity === 0).length;
+        document.getElementById('low-stock-count').textContent = lowStockCount;
+    }
+    
+    /**
+     * Simulates the function of the sidebar buttons that open dialogs.
+     * @param {string} action - The button text.
+     */
+    function simulateAction(action) {
+        alert(`DEMO MODE:\nFunctionality for '${action}' would open a complex dialog (JDialog) here. For this web demo, we are only simulating the action.\n\nDashboard and Table are live.`);
+    }
+
+    /**
+     * Simulates the function of the report generation buttons.
+     * @param {string} reportType - The type of report to generate.
+     */
+    function showReport(reportType) {
+        let content;
+        if (reportType === 'Stock Level Tracking') {
+            content = generateStockReport();
+        } else if (reportType === 'Expiry Tracking') {
+            content = generateExpiryReport();
+        } else if (reportType === 'Inventory Evaluation') {
+            content = generateValuationReport();
+        }
+
+        // Display report using a simple alert/prompt for demonstration
+        alert(`--- ${reportType.toUpperCase()} ---\n\n${content}`);
+    }
+
+    function generateStockReport() {
+        let report = "";
+        const categories = productData.map(p => p.category);
+        const uniqueCategories = [...new Set(categories)];
+
+        uniqueCategories.forEach(cat => {
+            report += `Category: ${cat}\n----------------------------------\n`;
+            productData.filter(p => p.category === cat).forEach(p => {
+                const statusText = getStockStatus(p.quantity).replace('_', ' ');
+                report += `${p.name.padEnd(20)} | Qty: ${String(p.quantity).padEnd(5)} | Status: ${statusText}\n`;
+            });
+            report += "\n";
+        });
+        return report;
+    }
+
+    function generateExpiryReport() {
+        const today = new Date();
+        const sevenDaysFromNow = new Date(today);
+        sevenDaysFromNow.setDate(today.getDate() + 7);
+
+        let expired = [];
+        let expiringSoon = [];
+
+        productData.filter(p => p.expiryDate).forEach(p => {
+            if (p.expiryDate < today) {
+                expired.push(p);
+            } else if (p.expiryDate <= sevenDaysFromNow) {
+                expiringSoon.push(p);
+            }
+        });
+
+        let report = "";
+        if (expired.length > 0) {
+            report += "EXPIRED PRODUCTS:\n";
+            expired.forEach(p => report += `• ${p.name} - Expired: ${formatExpiry(p.expiryDate)}\n`);
+            report += "\n";
+        }
+        if (expiringSoon.length > 0) {
+            report += "EXPIRING SOON (Within 7 days):\n";
+            expiringSoon.forEach(p => report += `• ${p.name} - Expires: ${formatExpiry(p.expiryDate)}\n`);
+            report += "\n";
+        }
+        if (expired.length === 0 && expiringSoon.length === 0) {
+            report += "No products are expired or expiring soon!";
+        }
+        return report;
+    }
+
+    function generateValuationReport() {
+        let report = "";
+        let grandTotal = 0;
+        const categories = productData.map(p => p.category);
+        const uniqueCategories = [...new Set(categories)];
+
+        uniqueCategories.forEach(cat => {
+            const categoryProducts = productData.filter(p => p.category === cat);
+            const categoryTotal = categoryProducts.reduce((sum, p) => sum + (p.quantity * p.price), 0);
+            grandTotal += categoryTotal;
+
+            report += `Category: ${cat}\n----------------------------------\n`;
+            categoryProducts.forEach(p => {
+                const productValue = p.quantity * p.price;
+                report += `${p.name.padEnd(20)} | Qty: ${String(p.quantity).padEnd(5)} | Unit: ${formatPrice(p.price).padEnd(10)} | Total: ${formatPrice(productValue)}\n`;
+            });
+            report += `Category Total: ${formatPrice(categoryTotal)}\n\n`;
+        });
+
+        report += `==================================\n`;
+        report += `GRAND TOTAL: ${formatPrice(grandTotal)}`;
+        return report;
+    }
+
+
+    // Initial setup on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTable();
+        updateDashboard();
+    });
+
+</script>
+
+</body>
+</html>
