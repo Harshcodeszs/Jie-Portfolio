@@ -1,0 +1,1 @@
+CloudMoney is a web-based ASP.NET banking application featuring secure user authentication, real-time transaction processing with business validation rules (deposits, withdrawals, peer-to-peer transfers), interactive reporting, and an embedded chatbot.
